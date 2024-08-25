@@ -10,6 +10,8 @@
 #include "mozilla/Maybe.h"
 #include "mozilla/TextUtils.h"
 
+#include "Taint.h"
+
 #include "gc/AllocKind.h"
 #include "gc/MaybeRooted.h"
 #include "js/Class.h"
@@ -36,6 +38,26 @@ class TypedArrayObject : public ArrayBufferViewObject {
                 "bad inlined constant in TypedData.h");
   static_assert(js::detail::TypedArrayDataSlot == DATA_SLOT,
                 "bad inlined constant in TypedData.h");
+
+  const TaintFlow& taint() const {
+    TaintFlow* flow = getTaintFlow();
+    if (flow) {
+      return *flow;
+    }
+    return TaintFlow::getEmptyTaintFlow();
+  }
+
+  void setTaint(const TaintFlow& taint) {
+    TaintFlow* flow = getTaintFlow();
+    if (flow) {
+      delete flow;
+    }
+    setTaintFlow(taint);
+  }
+
+  bool isTainted() const {
+    return !!getTaintNode();
+  }
 
   static bool sameBuffer(Handle<TypedArrayObject*> a,
                          Handle<TypedArrayObject*> b) {
@@ -159,6 +181,34 @@ class TypedArrayObject : public ArrayBufferViewObject {
  private:
   static bool set_impl(JSContext* cx, const CallArgs& args);
   static bool copyWithin_impl(JSContext* cx, const CallArgs& args);
+
+  inline TaintNode** getTaintNodeImpl() const {
+    return maybePtrFromReservedSlot<TaintNode*>(TAINT_SLOT);
+  }
+
+  inline TaintNode* getTaintNode() const {
+    TaintNode** n = getTaintNodeImpl();
+    if (!n) {
+      return nullptr;
+    }
+    return *n;
+  }
+
+  inline void setTaintNode(TaintNode* node) {
+    TaintNode** n = getTaintNodeImpl();
+    if (n != nullptr) {
+      *n = node;
+    }
+  }
+
+  inline TaintFlow* getTaintFlow() const {
+    TaintFlow* n = maybePtrFromReservedSlot<TaintFlow>(TAINT_SLOT);
+    return n;
+  }
+
+  inline void setTaintFlow(const TaintFlow& flow) {
+    setReservedSlot(TAINT_SLOT, PrivateValue(new TaintFlow(flow)));
+  }
 };
 
 extern TypedArrayObject* NewTypedArrayWithTemplateAndLength(

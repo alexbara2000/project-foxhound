@@ -87,12 +87,14 @@ void MarkTaintedFunctionArguments(JSContext* cx, JSFunction* function, const JS:
 
 // Check if the argument value is a tainted number object.
 bool isTaintedNumber(const JS::Value& val);
+bool isTaintedTypedArray(const JS::Value& val);
 
 // Check if the argument value is a tainted number object.
 bool isTaintedValue(const JS::Value& val);
 
 // Extract the taint information from a number.
 const TaintFlow& getNumberTaint(const JS::Value& val);
+const TaintFlow& getTypedArrayTaint(const JS::Value& val);
 
 // Extract the taint information from a number.
 const TaintFlow& getValueTaint(const JS::Value& val);

@@ -1894,6 +1894,31 @@ static bool taint_getNumberObjectValueIfTainted(JSContext* cx, unsigned argc,
   return true;
 }
 
+// TaintFox: Taint the string if the typed array is tainted
+static bool taint_taintStringIfArrayTainted(JSContext* cx, unsigned argc,
+                                                Value* vp) {
+  // String, operation, args...
+  CallArgs args = CallArgsFromVp(argc, vp);
+  MOZ_ASSERT(args.length() == 2);
+
+  // first argument is the array
+  RootedObject obj(cx, ToObject(cx, args[0]));
+  if (!obj) {
+    return false;
+  }
+
+  // second argument is the string that needs to be tainted if array is tainted
+  RootedString str(cx, args[1].toString());
+  if (!str) {
+    return false;
+  }
+
+  if (JS::isTaintedTypedArray(args[0])) {
+    str->taint().overlay(0, str->length()-1, JS::getTypedArrayTaint(args[0]));
+  }
+  return true;
+}
+
 static bool intrinsic_PromiseResolve(JSContext* cx, unsigned argc, Value* vp) {
   CallArgs args = CallArgsFromVp(argc, vp);
   MOZ_ASSERT(args.length() == 2);
@@ -2299,6 +2324,7 @@ static const JSFunctionSpec intrinsic_functions[] = {
     JS_FN("StringSplitStringLimit", intrinsic_StringSplitStringLimit, 3, 0),
     JS_INLINABLE_FN("SubstringKernel", intrinsic_SubstringKernel, 3, 0,
                     IntrinsicSubstringKernel),
+    JS_FN("TaintStringIfArrayTainted", taint_taintStringIfArrayTainted, 2, 0),
     JS_FN("ThisNumberValueForToLocaleString", ThisNumberValueForToLocaleString,
           0, 0),
     JS_FN("ThisTimeValue", intrinsic_ThisTimeValue, 1, 0),

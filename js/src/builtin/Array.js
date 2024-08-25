@@ -968,11 +968,20 @@ function ArrayToString() {
   // Steps 3-4.
   var func = array.join;
 
+  // Taintfox: adding taint to string when a typed array is tainted
+  var str;
+
   // Steps 5-6.
   if (!IsCallable(func)) {
-    return callFunction(std_Object_toString, array);
+    str = callFunction(std_Object_toString, array);
   }
-  return callContentFunction(func, array);
+  else {
+    str = callContentFunction(func, array);
+  }
+  if (typeof (str) === "string" && typeof (array) === "object") {
+    TaintStringIfArrayTainted(array, str);
+  }
+  return str;
 }
 
 // ES2017 draft rev f8a9be8ea4bd97237d176907a1e3080dce20c68f

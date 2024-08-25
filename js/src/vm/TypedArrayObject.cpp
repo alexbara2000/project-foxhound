@@ -173,6 +173,14 @@ void TypedArrayObject::finalize(JS::GCContext* gcx, JSObject* obj) {
     return;
   }
 
+  if (curObj) {
+    TaintFlow* flow = curObj->getTaintFlow();
+    if (flow) {
+      delete flow;
+      curObj->setReservedSlot(TAINT_SLOT, PrivateValue(nullptr));
+    }
+  }
+
   // Free the data slot pointer if it does not point into the old JSObject.
   if (!curObj->hasInlineElements()) {
     size_t nbytes = RoundUp(curObj->byteLength(), sizeof(Value));
@@ -252,6 +260,7 @@ size_t TypedArrayObject::objectMoved(JSObject* obj, JSObject* old) {
       ArrayBufferContentsArena);
   if (result == Nursery::BufferMoved) {
     newObj->setReservedSlot(DATA_SLOT, PrivateValue(buf));
+    newObj->setReservedSlot(TAINT_SLOT, PrivateValue(nullptr));
 
     // Set a forwarding pointer for the element buffers in case they were
     // preserved on the stack by Ion.
@@ -476,6 +485,7 @@ class TypedArrayObjectTemplate : public TypedArrayObject {
     tarray->initFixedSlot(TypedArrayObject::LENGTH_SLOT, PrivateValue(len));
     tarray->initFixedSlot(TypedArrayObject::BYTEOFFSET_SLOT,
                           PrivateValue(size_t(0)));
+    tarray->initReservedSlot(TAINT_SLOT, PrivateValue(nullptr));
 
 #ifdef DEBUG
     if (len == 0) {
@@ -500,6 +510,7 @@ class TypedArrayObjectTemplate : public TypedArrayObject {
       void* data = tarray->fixedData(FIXED_DATA_START);
       tarray->initReservedSlot(DATA_SLOT, PrivateValue(data));
       memset(data, 0, nbytes);
+      tarray->initReservedSlot(TAINT_SLOT, PrivateValue(nullptr));
     }
   }
 
@@ -982,6 +993,11 @@ template <typename NativeType>
   MOZ_ASSERT(!obj->hasDetachedBuffer());
   MOZ_ASSERT(index < obj->length());
 
+  if(isTaintedValue(v)){
+    TaintFlow flow = getValueTaint(v);
+    obj->setTaint(flow);
+  }
+
   // Step 1 is enforced by the caller.
 
   // Steps 2-3.
@@ -1402,6 +1418,31 @@ static bool TypedArray_byteOffsetGetter(JSContext* cx, unsigned argc,
                                                                           args);
 }
 
+static bool typed_array_taint_getter(JSContext* cx, unsigned argc, Value* vp)
+{
+  CallArgs args = CallArgsFromVp(argc, vp);
+  args.rval().setNull();
+
+  RootedObject typedArray(cx, &args.thisv().toObject());
+  if (!typedArray->is<TypedArrayObject>()) {
+    return true;
+  }
+
+  if (!typedArray->as<TypedArrayObject>().isTainted()) {
+    return true;
+  }
+
+  const TaintFlow& taint = typedArray->as<TypedArrayObject>().taint();
+
+  RootedObject taint_obj(cx, JS_NewObject(cx, nullptr));
+  if (!getTaintFlowObject(cx, taint, taint_obj)) {
+    return false;
+  }
+
+  args.rval().setObject(*taint_obj);
+  return true;
+}
+
 static bool ByteLengthGetterImpl(JSContext* cx, const CallArgs& args) {
   auto* tarr = &args.thisv().toObject().as<TypedArrayObject>();
   args.rval().set(tarr->byteLengthValue());
@@ -1468,6 +1509,7 @@ static bool TypedArray_toStringTagGetter(JSContext* cx, unsigned argc,
     JS_PSG("buffer", TypedArray_bufferGetter, 0),
     JS_PSG("byteLength", TypedArray_byteLengthGetter, 0),
     JS_PSG("byteOffset", TypedArray_byteOffsetGetter, 0),
+    JS_PSG("taint", typed_array_taint_getter, JSPROP_PERMANENT),
     JS_SYM_GET(toStringTag, TypedArray_toStringTagGetter, 0),
     JS_PS_END};
 

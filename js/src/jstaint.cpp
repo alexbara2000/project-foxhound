@@ -24,6 +24,7 @@
 #include "vm/JSFunction.h"
 #include "vm/NumberObject.h"
 #include "vm/StringType.h"
+#include "vm/TypedArrayObject.h"
 
 using namespace JS;
 
@@ -379,6 +380,15 @@ bool JS::isTaintedNumber(const Value& val)
     return false;
 }
 
+bool JS::isTaintedTypedArray(const Value& val)
+{
+    if (val.isObject() && val.toObject().is<TypedArrayObject>()) {
+        TypedArrayObject& typedArray = val.toObject().as<TypedArrayObject>();
+        return typedArray.isTainted();
+    }
+    return false;
+}
+
 bool JS::isTaintedValue(const Value& val)
 {
     if (val.isObject() && val.toObject().is<NumberObject>()) {
@@ -409,6 +419,15 @@ const TaintFlow& JS::getNumberTaint(const Value& val)
     if (val.isObject() && val.toObject().is<NumberObject>()) {
         NumberObject& number = val.toObject().as<NumberObject>();
         return number.taint();
+    }
+    return TaintFlow::getEmptyTaintFlow();
+}
+
+const TaintFlow& JS::getTypedArrayTaint(const Value& val)
+{
+    if (val.isObject() && val.toObject().is<TypedArrayObject>()) {
+        TypedArrayObject& typedArray = val.toObject().as<TypedArrayObject>();
+        return typedArray.taint();
     }
     return TaintFlow::getEmptyTaintFlow();
 }

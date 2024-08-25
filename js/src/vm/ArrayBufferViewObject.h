@@ -39,10 +39,13 @@ class ArrayBufferViewObject : public NativeObject {
   // Offset of view within underlying (Shared)ArrayBufferObject.
   static constexpr size_t BYTEOFFSET_SLOT = 2;
 
+  static const unsigned TAINT_SLOT = 3;
   // Pointer to raw buffer memory.
-  static constexpr size_t DATA_SLOT = 3;
+  static constexpr size_t DATA_SLOT = 4;
 
-  static constexpr size_t RESERVED_SLOTS = 4;
+
+
+  static constexpr size_t RESERVED_SLOTS = 5;
 
 #ifdef DEBUG
   static const uint8_t ZeroLengthArrayData = 0x4A;
