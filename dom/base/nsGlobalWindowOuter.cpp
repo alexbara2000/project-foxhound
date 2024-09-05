@@ -3439,7 +3439,7 @@ void nsGlobalWindowOuter::GetNameOuter(nsAString& aName) {
   }
 
   // TaintFox: window.name taint source.
-  MarkTaintSource(aName, "window.name");
+  // MarkTaintSource(aName, "window.name");
 }
 
 void nsGlobalWindowOuter::SetNameOuter(const nsAString& aName,
@@ -5835,6 +5835,7 @@ void nsGlobalWindowOuter::PostMessageMozOuter(JSContext* aCx,
                                               JS::Handle<JS::Value> aTransfer,
                                               nsIPrincipal& aSubjectPrincipal,
                                               ErrorResult& aError) {
+// ReportTaintSink(aCx, aMessage, "MessagePort.PostMessage.globalwindowouter");
   RefPtr<BrowsingContext> sourceBc;
   nsAutoString origin;
   nsCOMPtr<nsIURI> targetOriginURI;

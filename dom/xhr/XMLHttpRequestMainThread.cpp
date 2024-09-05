@@ -582,7 +582,7 @@ void XMLHttpRequestMainThread::GetResponseText(DOMString& aResponseText,
   GetAllResponseHeaders(responseHeaders, aRv);
   args.AppendElement(NS_ConvertUTF8toUTF16(responseHeaders));
 
-  MarkTaintSource(aResponseText, "XMLHttpRequest.response", args);
+  // MarkTaintSource(aResponseText, "XMLHttpRequest.response", args);
 }
 
 void XMLHttpRequestMainThread::GetResponseText(

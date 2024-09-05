@@ -7,6 +7,8 @@
  * Modifications Copyright SAP SE. 2019-2021.  All rights reserved.
  */
 
+#include <iostream>
+
 #include "nsAttrValue.h"
 #include "nsAttrValueOrString.h"
 #include "nsGenericHTMLElement.h"
@@ -146,7 +148,7 @@ void HTMLScriptElement::GetInnerHTML(nsAString& aInnerHTML,
     aError.ReportOOM();
   }
   // Taintfox: script.innerHTML source
-  MarkTaintSourceElement(aInnerHTML, "script.innerHTML", this);
+  // MarkTaintSourceElement(aInnerHTML, "script.innerHTML", this);
 }
 
 void HTMLScriptElement::SetInnerHTML(const nsAString& aInnerHTML,

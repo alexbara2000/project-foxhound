@@ -51,17 +51,17 @@ Navigator includes GlobalPrivacyControl;
 
 interface mixin NavigatorID {
   // WebKit/Blink/Trident/Presto support this (hardcoded "Mozilla").
-  [Constant, Cached, Throws, TaintSource]
+  [Constant, Cached, Throws]
   readonly attribute DOMString appCodeName; // constant "Mozilla"
-  [Constant, Cached, TaintSource]
+  [Constant, Cached]
   readonly attribute DOMString appName; // constant "Netscape"
-  [Constant, Cached, Throws, NeedsCallerType, TaintSource]
+  [Constant, Cached, Throws, NeedsCallerType]
   readonly attribute DOMString appVersion;
-  [Pure, Cached, Throws, NeedsCallerType, TaintSource]
+  [Pure, Cached, Throws, NeedsCallerType]
   readonly attribute DOMString platform;
-  [Pure, Cached, Throws, NeedsCallerType, TaintSource]
+  [Pure, Cached, Throws, NeedsCallerType]
   readonly attribute DOMString userAgent;
-  [Constant, Cached, TaintSource]
+  [Constant, Cached]
   readonly attribute DOMString product; // constant "Gecko"
 
   // Everyone but WebKit/Blink supports this.  See bug 679971.
@@ -76,9 +76,9 @@ interface mixin NavigatorLanguage {
   // main-thread from the worker thread anytime we need to retrieve them. They
   // are updated when pref intl.accept_languages is changed.
 
-  [Pure, Cached, TaintSource]
+  [Pure, Cached]
   readonly attribute DOMString? language;
-  [Pure, Cached, Frozen, TaintSource]
+  [Pure, Cached, Frozen]
   readonly attribute sequence<DOMString> languages;
 };
 
@@ -121,7 +121,7 @@ partial interface Navigator {
 
 // http://www.w3.org/TR/tracking-dnt/ sort of
 partial interface Navigator {
-  [TaintSource]
+  // [TaintSource]
   readonly attribute DOMString doNotTrack;
 };
 
@@ -155,7 +155,7 @@ partial interface Navigator {
 
 // http://www.w3.org/TR/pointerevents/#extensions-to-the-navigator-interface
 partial interface Navigator {
-    [NeedsCallerType, TaintSource]
+    [NeedsCallerType]
     readonly attribute long maxTouchPoints;
 };
 
@@ -180,20 +180,20 @@ partial interface Navigator {
 };
 
 partial interface Navigator {
-  [Throws, Constant, Cached, NeedsCallerType, TaintSource]
+  [Throws, Constant, Cached, NeedsCallerType]
   readonly attribute DOMString oscpu;
   // WebKit/Blink support this; Trident/Presto do not.
-  [TaintSource]
+  // [TaintSource]
   readonly attribute DOMString vendor;
   // WebKit/Blink supports this (hardcoded ""); Trident/Presto do not.
-  [TaintSource]
+  // [TaintSource]
   readonly attribute DOMString vendorSub;
   // WebKit/Blink supports this (hardcoded "20030107"); Trident/Presto don't
-  [TaintSource]
+  // [TaintSource]
   readonly attribute DOMString productSub;
   // WebKit/Blink/Trident/Presto support this.
   readonly attribute boolean cookieEnabled;
-  [Throws, Constant, Cached, NeedsCallerType, TaintSource]
+  [Throws, Constant, Cached, NeedsCallerType]
   readonly attribute DOMString buildID;
 
   // WebKit/Blink/Trident/Presto support this.

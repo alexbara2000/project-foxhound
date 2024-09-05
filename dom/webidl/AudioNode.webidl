@@ -51,13 +51,13 @@ interface AudioNode : EventTarget {
     undefined disconnect(AudioParam destination, unsigned long output);
 
     readonly attribute BaseAudioContext context;
-    [TaintSource]
+    // [TaintSource]
     readonly attribute unsigned long numberOfInputs;
-    [TaintSource]
+    // [TaintSource]
     readonly attribute unsigned long numberOfOutputs;
 
     // Channel up-mixing and down-mixing rules for all inputs.
-    [SetterThrows, TaintSource]
+    [SetterThrows]
     attribute unsigned long channelCount;
     [SetterThrows, BinaryName="channelCountModeValue"]
     attribute ChannelCountMode channelCountMode;

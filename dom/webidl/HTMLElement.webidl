@@ -89,9 +89,9 @@ partial interface HTMLElement {
   readonly attribute Element? offsetParent;
   readonly attribute long offsetTop;
   readonly attribute long offsetLeft;
-  [TaintSource]
+  // [TaintSource]
   readonly attribute long offsetWidth;
-  [TaintSource]
+  // [TaintSource]
   readonly attribute long offsetHeight;
 };
 

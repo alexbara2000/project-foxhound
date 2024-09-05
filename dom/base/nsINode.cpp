@@ -996,7 +996,7 @@ void nsINode::GetBaseURIFromJS(nsAString& aURI, CallerType aCallerType,
   CopyUTF8toUTF16(spec, aURI);
 
   // TaintFox: document.baseURI taint source.
-  MarkTaintSource(aURI, "document.baseURI");
+  // MarkTaintSource(aURI, "document.baseURI");
 }
 
 nsIURI* nsINode::GetBaseURIObject() const { return GetBaseURI(true); }

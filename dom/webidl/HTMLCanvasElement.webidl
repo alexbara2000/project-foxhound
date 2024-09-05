@@ -26,7 +26,7 @@ interface HTMLCanvasElement : HTMLElement {
   [Throws]
   nsISupports? getContext(DOMString contextId, optional any contextOptions = null);
 
-  [Throws, NeedsSubjectPrincipal, TaintSource]
+  [Throws, NeedsSubjectPrincipal]
   DOMString toDataURL(optional DOMString type = "",
                       optional any encoderOptions);
   [Throws, NeedsSubjectPrincipal]

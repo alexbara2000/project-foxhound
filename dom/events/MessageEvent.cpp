@@ -68,7 +68,7 @@ void MessageEvent::GetData(JSContext* aCx, JS::MutableHandle<JS::Value> aData,
   }
 
   // Taintfox: MessageEvent source
-  MarkTaintSource(aCx, aData, "MessageEvent", mOrigin);
+  // MarkTaintSource(aCx, aData, "MessageEvent", mOrigin);
 }
 
 void MessageEvent::GetOrigin(nsAString& aOrigin) const { aOrigin = mOrigin; }

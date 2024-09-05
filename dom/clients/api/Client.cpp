@@ -17,6 +17,7 @@
 #include "mozilla/dom/WorkerScope.h"
 #include "nsIDUtils.h"
 #include "nsIGlobalObject.h"
+#include "nsTaintingUtils.h"
 
 namespace mozilla::dom {
 
@@ -83,6 +84,7 @@ FrameType Client::GetFrameType() const { return mData->info().frameType(); }
 void Client::PostMessage(JSContext* aCx, JS::Handle<JS::Value> aMessage,
                          const Sequence<JSObject*>& aTransferable,
                          ErrorResult& aRv) {
+  ReportTaintSink(aCx, aMessage, "MessagePort.PostMessage.broadcastchannel");
   MOZ_ASSERT(!NS_IsMainThread());
   WorkerPrivate* workerPrivate = GetCurrentThreadWorkerPrivate();
   MOZ_DIAGNOSTIC_ASSERT(workerPrivate);

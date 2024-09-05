@@ -39,6 +39,9 @@
 #include "mozilla/ScopeExit.h"
 
 #include <algorithm>
+#include <codecvt>
+#include <iostream>
+#include <locale>
 #include <memory>
 #include <utility>
 
@@ -79,6 +82,7 @@
 #include "vm/JSContext-inl.h"
 #include "vm/JSObject-inl.h"
 #include "vm/NativeObject-inl.h"
+#include "vm/NumberObject-inl.h"
 #include "vm/ObjectOperations-inl.h"
 #include "vm/Realm-inl.h"
 
@@ -2053,11 +2057,31 @@ bool JSStructuredCloneWriter::startWrite(HandleValue v) {
       return traverseObject(obj, cls);
     case ESClass::Number: {
       RootedValue unboxed(context());
+      RootedValue rootedObj(context(), JS::ObjectValue(*obj));
       if (!Unbox(context(), obj, &unboxed)) {
         return false;
       }
-      return out.writePair(SCTAG_NUMBER_OBJECT, 0) &&
-             out.writeDouble(unboxed.toNumber());
+      int flag = 0;
+      const char* sourceName;
+      bool isTainted = isTaintedNumber(rootedObj);
+      if(isTainted){
+        flag = 1;
+        sourceName = getNumberTaint(rootedObj).source().name();
+      }
+      bool result = out.writePair(SCTAG_NUMBER_OBJECT, flag) && out.writeDouble(unboxed.toNumber());
+
+      if (isTainted){
+        // TaintFox
+        // Convert source name of taint to serialize it
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+        std::u16string u16Str = convert.from_bytes(sourceName);
+        char16_t* u16Array = new char16_t[u16Str.size() + 1];
+        std::copy(u16Str.begin(), u16Str.end(), u16Array);
+        u16Array[u16Str.size()] = 0;
+        out.writeDouble(u16Str.size() + 1);
+        result = result  && out.writeChars(u16Array, u16Str.size() + 1);
+      }
+      return result;
     }
     case ESClass::String: {
       RootedValue unboxed(context());
@@ -2942,6 +2966,24 @@ bool JSStructuredCloneReader::startRead(MutableHandleValue vp,
       vp.setDouble(CanonicalizeNaN(d));
       if (!PrimitiveToObject(context(), vp)) {
         return false;
+      }
+      if(data == 1){
+        // TaintFox
+        // data being 1 represents a tainted objects so we need to get the source.
+        double size;
+        in.readDouble(&size);
+        char16_t* sourceName = new char16_t[size];
+        in.readChars(sourceName, size);
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+        std::string u8Str = convert.to_bytes(sourceName);
+        char* u8Array = new char[u8Str.size() + 1];
+        std::copy(u8Str.begin(), u8Str.end(), u8Array);
+        u8Array[u8Str.size()] = '\0';
+        const char* sourceNameFinal = u8Array;
+        TaintOperation op(sourceNameFinal, { taintarg(context(), d) });
+        op.setSource();
+        NumberObject* result = NumberObject::createTainted(context(), d, TaintFlow(op));
+        vp.setObject(*result);
       }
       break;
     }

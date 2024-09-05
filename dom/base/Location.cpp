@@ -147,7 +147,7 @@ void Location::GetHash(nsAString& aHash, nsIPrincipal& aSubjectPrincipal,
   }
 
   // TaintFox: location.hash source.
-  MarkTaintSource(aHash, "location.hash");
+  // MarkTaintSource(aHash, "location.hash");
 
   mCachedHash = aHash;
 }
@@ -205,7 +205,7 @@ void Location::GetHost(nsAString& aHost, nsIPrincipal& aSubjectPrincipal,
       AppendUTF8toUTF16(hostport, aHost);
 
       // TaintFox: location.host source.
-      MarkTaintSource(aHost, "location.host");
+      // MarkTaintSource(aHost, "location.host");
     }
   }
 }
@@ -250,7 +250,7 @@ void Location::GetHostname(nsAString& aHostname,
     nsContentUtils::GetHostOrIPv6WithBrackets(uri, aHostname);
 
     // TaintFox: location.hostname source.
-    MarkTaintSource(aHostname, "location.hostname");
+    // MarkTaintSource(aHostname, "location.hostname");
   }
 }
 
@@ -294,7 +294,7 @@ nsresult Location::GetHref(nsAString& aHref) {
   AppendUTF8toUTF16(uriString, aHref);
 
   // TaintFox: location.href source.
-  MarkTaintSource(aHref, "location.href");
+  // MarkTaintSource(aHref, "location.href");
 
   return NS_OK;
 }
@@ -323,7 +323,7 @@ void Location::GetOrigin(nsAString& aOrigin, nsIPrincipal& aSubjectPrincipal,
   aOrigin = origin;
 
   // TaintFox: location.origin source.
-  MarkTaintSource(aOrigin, "location.origin");
+  // MarkTaintSource(aOrigin, "location.origin");
 }
 
 void Location::GetPathname(nsAString& aPathname,
@@ -351,7 +351,7 @@ void Location::GetPathname(nsAString& aPathname,
   AppendUTF8toUTF16(file, aPathname);
 
   // TaintFox: location.pathname source.
-  MarkTaintSource(aPathname, "location.pathname");
+  // MarkTaintSource(aPathname, "location.pathname");
 }
 
 void Location::SetPathname(const nsAString& aPathname,
@@ -404,7 +404,7 @@ void Location::GetPort(nsAString& aPort, nsIPrincipal& aSubjectPrincipal,
     portStr.AppendInt(port);
     aPort.Append(portStr);
     // TaintFox: location.port source.
-    MarkTaintSource(aPort, "location.port");
+    // MarkTaintSource(aPort, "location.port");
   }
 }
 
@@ -471,7 +471,7 @@ void Location::GetProtocol(nsAString& aProtocol,
   aProtocol.Append(char16_t(':'));
 
   // TaintFox: location.protocol source.
-  MarkTaintSource(aProtocol, "location.protocol");
+  // MarkTaintSource(aProtocol, "location.protocol");
 }
 
 void Location::SetProtocol(const nsAString& aProtocol,
@@ -556,7 +556,7 @@ void Location::GetSearch(nsAString& aSearch, nsIPrincipal& aSubjectPrincipal,
       AppendUTF8toUTF16(search, aSearch);
 
       // TaintFox: location.search source.
-      MarkTaintSource(aSearch, "location.search");
+      // MarkTaintSource(aSearch, "location.search");
     }
   }
 }

@@ -2041,7 +2041,7 @@ nsresult WebSocket::CreateAndDispatchMessageEvent(const nsACString& aData,
     // Propagate Taint
     JS_SetStringTaint(cx, jsString, aData.Taint());
     // Taintfox: WebSocket.MessageEvent.data
-    MarkTaintSource(cx, jsString, "WebSocket.MessageEvent.data");
+    // MarkTaintSource(cx, jsString, "WebSocket.MessageEvent.data");
 
     jsData.setString(jsString);
   }

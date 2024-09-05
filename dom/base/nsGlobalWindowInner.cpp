@@ -4022,6 +4022,8 @@ void nsGlobalWindowInner::PostMessageMoz(JSContext* aCx,
                                          JS::Handle<JS::Value> aTransfer,
                                          nsIPrincipal& aSubjectPrincipal,
                                          ErrorResult& aError) {
+
+  // ReportTaintSink(aCx, aMessage, "MessagePort.PostMessage.globalwindow");
   FORWARD_TO_OUTER_OR_THROW(
       PostMessageMozOuter,
       (aCx, aMessage, aTargetOrigin, aTransfer, aSubjectPrincipal, aError),

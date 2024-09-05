@@ -1115,7 +1115,7 @@ nsresult PushMessageData::EnsureDecodedText() {
     return rv;
   }
   // Taintfox: PushMessageData source
-  MarkTaintSource(mDecodedText, "PushMessageData");
+  // MarkTaintSource(mDecodedText, "PushMessageData");
   return NS_OK;
 }
 

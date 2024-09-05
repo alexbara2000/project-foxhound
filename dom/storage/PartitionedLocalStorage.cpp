@@ -67,7 +67,7 @@ void PartitionedLocalStorage::GetItem(const nsAString& aKey, nsAString& aResult,
   mCache->GetItem(aKey, aResult);
 
   // TaintFox: localStorage.getItem source
-  MarkTaintSource(aResult, "localStorage.getItem", aKey);
+  // MarkTaintSource(aResult, "localStorage.getItem", aKey);
 }
 
 void PartitionedLocalStorage::GetSupportedNames(nsTArray<nsString>& aKeys) {

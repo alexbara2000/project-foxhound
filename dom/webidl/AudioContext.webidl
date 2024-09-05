@@ -25,9 +25,9 @@ interface AudioContext : BaseAudioContext {
     [Throws]
     constructor(optional AudioContextOptions contextOptions = {});
 
-    [TaintSource]
+    // [TaintSource]
     readonly        attribute double               baseLatency;
-    [TaintSource]
+    // [TaintSource]
     readonly        attribute double               outputLatency;
     AudioTimestamp                  getOutputTimestamp();
 

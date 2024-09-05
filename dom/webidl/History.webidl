@@ -15,7 +15,7 @@ enum ScrollRestoration { "auto", "manual" };
 
 [Exposed=Window]
 interface History {
-  [Throws, TaintSource]
+  [Throws]
   readonly attribute unsigned long length;
   [Throws]
   attribute ScrollRestoration scrollRestoration;

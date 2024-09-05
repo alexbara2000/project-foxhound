@@ -18,36 +18,46 @@ interface MouseEvent : UIEvent {
   constructor(DOMString typeArg,
               optional MouseEventInit mouseEventInitDict = {});
 
-  [NeedsCallerType]
+  [NeedsCallerType, TaintSource]
   readonly attribute long           screenX;
-  [NeedsCallerType]
+  [NeedsCallerType, TaintSource]
   readonly attribute long           screenY;
 
   [ChromeOnly]
   readonly attribute nsIScreen?     screen;
 
+  [TaintSource]
   readonly attribute long           pageX;
+  [TaintSource]
   readonly attribute long           pageY;
+  [TaintSource]
   readonly attribute long           clientX;
+  [TaintSource]
   readonly attribute long           clientY;
-  [BinaryName="clientX"]
+  [BinaryName="clientX", TaintSource]
   readonly attribute long           x;
-  [BinaryName="clientY"]
+  [BinaryName="clientY", TaintSource]
   readonly attribute long           y;
+  [TaintSource]
   readonly attribute long           offsetX;
+  [TaintSource]
   readonly attribute long           offsetY;
+  [TaintSource]
   readonly attribute boolean        ctrlKey;
+  [TaintSource]
   readonly attribute boolean        shiftKey;
   readonly attribute boolean        altKey;
   readonly attribute boolean        metaKey;
   readonly attribute short          button;
   readonly attribute unsigned short buttons;
   readonly attribute EventTarget?   relatedTarget;
-  [Pref="dom.mouse_event.region.enabled"]
+  [Pref="dom.mouse_event.region.enabled", TaintSource]
   readonly attribute DOMString?     region;
 
   // Pointer Lock
+  [TaintSource]
   readonly attribute long           movementX;
+  [TaintSource]
   readonly attribute long           movementY;
 
   // Deprecated in DOM Level 3:

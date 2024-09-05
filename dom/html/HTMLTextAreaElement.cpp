@@ -180,7 +180,7 @@ void HTMLTextAreaElement::SetTaintSourceGetAttr(const nsAString& aName, nsAStrin
     // This will taint *all* input types, including those where the actual values
     // could be limited. Still, these inputs should still not change the syntax
     // of any sink calls
-    MarkTaintSourceElement(aResult, "textarea.value", this);
+    // MarkTaintSourceElement(aResult, "textarea.value", this);
   }
 
   return;
@@ -194,7 +194,7 @@ void HTMLTextAreaElement::SetTaintSourceGetAttr(const nsAString& aName, DOMStrin
     // This will taint *all* input types, including those where the actual values
     // could be limited. Still, these inputs should still not change the syntax
     // of any sink calls
-    MarkTaintSourceElement(aResult, "textarea.value", this);
+    // MarkTaintSourceElement(aResult, "textarea.value", this);
   }
 
   return;

@@ -25,6 +25,7 @@
 #include "mozilla/StorageAccess.h"
 
 #include "nsICookieJarSettings.h"
+#include "nsTaintingUtils.h"
 #include "mozilla/dom/Document.h"
 
 #ifdef XP_WIN
@@ -268,6 +269,7 @@ already_AddRefed<BroadcastChannel> BroadcastChannel::Constructor(
 void BroadcastChannel::PostMessage(JSContext* aCx,
                                    JS::Handle<JS::Value> aMessage,
                                    ErrorResult& aRv) {
+  ReportTaintSink(aCx, aMessage, "MessagePort.PostMessage.broadcastchannel");
   if (mState != StateActive) {
     aRv.Throw(NS_ERROR_DOM_INVALID_STATE_ERR);
     return;

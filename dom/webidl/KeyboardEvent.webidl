@@ -11,14 +11,14 @@ interface KeyboardEvent : UIEvent
   constructor(DOMString typeArg,
               optional KeyboardEventInit keyboardEventInitDict= {});
 
-  [NeedsCallerType]
+  [NeedsCallerType, TaintSource]
   readonly attribute unsigned long    charCode;
-  [NeedsCallerType]
+  [NeedsCallerType, TaintSource]
   readonly attribute unsigned long    keyCode;
 
-  [NeedsCallerType]
+  [NeedsCallerType, TaintSource]
   readonly attribute boolean          altKey;
-  [NeedsCallerType]
+  [NeedsCallerType, TaintSource]
   readonly attribute boolean          ctrlKey;
   [NeedsCallerType]
   readonly attribute boolean          shiftKey;
@@ -36,6 +36,7 @@ interface KeyboardEvent : UIEvent
   readonly attribute boolean       repeat;
   readonly attribute boolean       isComposing;
 
+  [TaintSource]
   readonly attribute DOMString key;
   [NeedsCallerType]
   readonly attribute DOMString code;

@@ -2776,12 +2776,12 @@ bool Element::ParseAttribute(int32_t aNamespaceID, nsAtom* aAttribute,
 }
 
 void Element::SetTaintSourceGetAttr(const nsAString& aName, nsAString& aResult) const {
-  MarkTaintSourceAttribute(aResult, "element.attribute", this, aName);
+  // MarkTaintSourceAttribute(aResult, "element.attribute", this, aName);
   return;
 }
 
 void Element::SetTaintSourceGetAttr(const nsAString& aName, DOMString& aResult) const {
-  MarkTaintSourceAttribute(aResult, "element.attribute", this, aName);
+  // MarkTaintSourceAttribute(aResult, "element.attribute", this, aName);
   return;
 }
 
@@ -5095,7 +5095,7 @@ void Element::TaintSelectorOperation(const char* operation, const nsAString& aEl
   }
   // Mark this operation as a source, so even if there is not a direct flow,
   // we might still be able to find an indirect one.
-  MarkTaintSource(flow, operation, aElementId);
+  // MarkTaintSource(flow, operation, aElementId);
 
   // Add it to the list
   mTaintList.append(flow);

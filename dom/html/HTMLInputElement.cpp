@@ -1188,7 +1188,7 @@ void HTMLInputElement::SetTaintSourceGetAttr(const nsAString& aName, nsAString& 
     // This will taint *all* input types, including those where the actual values
     // could be limited. Still, these inputs should still not change the syntax
     // of any sink calls
-    MarkTaintSourceElement(aResult, "input.value", this);
+    // MarkTaintSourceElement(aResult, "input.value", this);
   }
 
   return;
@@ -1202,7 +1202,7 @@ void HTMLInputElement::SetTaintSourceGetAttr(const nsAString& aName, DOMString& 
     // This will taint *all* input types, including those where the actual values
     // could be limited. Still, these inputs should still not change the syntax
     // of any sink calls
-    MarkTaintSourceElement(aResult, "input.value", this);
+    // MarkTaintSourceElement(aResult, "input.value", this);
   }
 
   return;

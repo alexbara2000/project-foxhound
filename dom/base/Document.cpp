@@ -6441,7 +6441,7 @@ void Document::GetReferrer(nsAString& aReferrer) const {
   CopyUTF8toUTF16(uri, aReferrer);
 
   // TaintFox: document.referrer taint source.
-  MarkTaintSource(aReferrer, "document.referrer");
+  // MarkTaintSource(aReferrer, "document.referrer");
 }
 
 void Document::GetCookie(nsAString& aCookie, ErrorResult& aRv) {
@@ -6487,7 +6487,7 @@ void Document::GetCookie(nsAString& aCookie, ErrorResult& aRv) {
     UTF_8_ENCODING->DecodeWithoutBOMHandling(cookie, aCookie);
 
     // TaintFox: document.cookie source.
-    MarkTaintSource(aCookie, "document.cookie");
+    // MarkTaintSource(aCookie, "document.cookie");
   }
 }
 
@@ -10085,7 +10085,7 @@ nsresult Document::GetDocumentURI(nsString& aDocumentURI) const {
     CopyUTF8toUTF16(uri, aDocumentURI);
 
     // TaintFox: document.documentURI taint source.
-    MarkTaintSource(aDocumentURI, "document.documentURI");
+    // MarkTaintSource(aDocumentURI, "document.documentURI");
   } else {
     aDocumentURI.Truncate();
   }
@@ -10113,7 +10113,7 @@ void Document::GetDocumentURIFromJS(nsString& aDocumentURI,
   CopyUTF8toUTF16(uri, aDocumentURI);
 
   // TaintFox: document.documentURI taint source.
-  MarkTaintSource(aDocumentURI, "document.documentURI");
+  // MarkTaintSource(aDocumentURI, "document.documentURI");
 }
 
 nsIURI* Document::GetDocumentURIObject() const {

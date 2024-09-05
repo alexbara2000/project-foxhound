@@ -7,7 +7,7 @@
     // ESLint support.
     "dbaeumer.vscode-eslint",
     // Prettier support.
-    "esbenp.prettier-vscode",
+    // "esbenp.prettier-vscode",
     // C/C++ language support with clangd
     "llvm-vs-code-extensions.vscode-clangd",
     // Provides support for rust-analyzer: novel LSP server for the Rust programming language.
