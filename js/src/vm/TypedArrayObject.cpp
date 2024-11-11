@@ -983,7 +983,7 @@ template <typename NativeType>
   MOZ_ASSERT(index < obj->length());
 
   // Step 1 is enforced by the caller.
-
+  JS_ReportTaintSink(cx, v, "TypedArray.setElem");
   // Steps 2-3.
   NativeType nativeValue;
   if (!convertValue(cx, v, &nativeValue)) {
@@ -1631,7 +1631,7 @@ static bool SetTypedArrayFromArrayLike(JSContext* cx,
 /* static */
 bool TypedArrayObject::set_impl(JSContext* cx, const CallArgs& args) {
   MOZ_ASSERT(TypedArrayObject::is(args.thisv()));
-
+  JS_ReportTaintSink(cx, args[1], "TypedArray.set");
   // Steps 1-3 (Validation performed as part of CallNonGenericMethod).
   Rooted<TypedArrayObject*> target(
       cx, &args.thisv().toObject().as<TypedArrayObject>());

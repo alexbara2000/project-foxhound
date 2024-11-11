@@ -455,6 +455,7 @@ class ElementSpecific {
           return false;
         }
       }
+      JS_ReportTaintSink(cx, v, "TypedArray.setFromArray");
 
       T n;
       if (!valueToNative(cx, v, &n)) {
