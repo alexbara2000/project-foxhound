@@ -2063,23 +2063,63 @@ bool JSStructuredCloneWriter::startWrite(HandleValue v) {
       }
       int flag = 0;
       const char* sourceName;
+      std::u16string filename;
+      uint32_t line;
+      uint32_t pos;
+      uint32_t scriptStartLine;
+      std::u16string function;
+      TaintMd5 scriptHash;
       bool isTainted = isTaintedNumber(rootedObj);
       if(isTainted){
         flag = 1;
+
+        // Get the source name
         sourceName = getNumberTaint(rootedObj).source().name();
+
+        // Get the location components
+        TaintLocation location = getNumberTaint(rootedObj).source().location();
+        filename = location.filename();
+        line = location.line();
+        pos= location.pos();
+        scriptStartLine = location.scriptStartLine();
+        function = location.function();
+        scriptHash = location.scriptHash();
       }
       bool result = out.writePair(SCTAG_NUMBER_OBJECT, flag) && out.writeDouble(unboxed.toNumber());
 
       if (isTainted){
+        // std::cerr << "GOT TO IS TAINTED" << std::endl;
         // TaintFox
         // Convert source name of taint to serialize it
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+
+        // Write source
         std::u16string u16Str = convert.from_bytes(sourceName);
         char16_t* u16Array = new char16_t[u16Str.size() + 1];
         std::copy(u16Str.begin(), u16Str.end(), u16Array);
         u16Array[u16Str.size()] = 0;
         out.writeDouble(u16Str.size() + 1);
         result = result  && out.writeChars(u16Array, u16Str.size() + 1);
+        // std::cerr << "ABOUT TO WRITE LOCATION" << std::endl;
+
+        // Write location
+        u16Array = new char16_t[filename.size() + 1];
+        std::copy(filename.begin(), filename.end(), u16Array);
+        u16Array[filename.size()] = 0;
+        out.writeDouble(filename.size() + 1);
+        result = result  && out.writeChars(u16Array, filename.size() + 1);
+        out.writeDouble(line + 1);
+        out.writeDouble(pos + 1);
+        out.writeDouble(scriptStartLine + 1);
+
+        u16Array = new char16_t[function.size() + 1];
+        std::copy(function.begin(), function.end(), u16Array);
+        u16Array[function.size()] = 0;
+        out.writeDouble(function.size() + 1);
+        result = result  && out.writeChars(u16Array, function.size() + 1);
+        out.writeArray(scriptHash.data(), scriptHash.size());
+
+        // std::cerr << "LOCATION WROTE" << std::endl;
       }
       return result;
     }
@@ -2970,17 +3010,43 @@ bool JSStructuredCloneReader::startRead(MutableHandleValue vp,
       if(data == 1){
         // TaintFox
         // data being 1 represents a tainted objects so we need to get the source.
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+
+        // Reading source name
         double size;
         in.readDouble(&size);
         char16_t* sourceName = new char16_t[size];
         in.readChars(sourceName, size);
-        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
         std::string u8Str = convert.to_bytes(sourceName);
         char* u8Array = new char[u8Str.size() + 1];
         std::copy(u8Str.begin(), u8Str.end(), u8Array);
         u8Array[u8Str.size()] = '\0';
         const char* sourceNameFinal = u8Array;
-        TaintOperation op(sourceNameFinal, { taintarg(context(), d) });
+
+        // Reading location
+        char16_t* fileName;
+        double line;
+        double pos;
+        double scriptStartLine;
+        char16_t* function;
+        TaintMd5 scriptHash;
+        // std::cerr << "ABOUT TO READ LOCATION" << std::endl;
+        in.readDouble(&size);
+        fileName = new char16_t[size];
+        in.readChars(fileName, size);
+        in.readDouble(&line);
+        in.readDouble(&pos);
+        in.readDouble(&scriptStartLine);
+        in.readDouble(&size);
+        function = new char16_t[size];
+        in.readChars(function, size);
+        in.readArray(scriptHash.begin(),16);
+
+        // std::cerr << "READ LOCATION" << std::endl;
+
+        TaintLocation newLoc =TaintLocation(fileName, line,pos,scriptStartLine,scriptHash,function);
+
+        TaintOperation op(sourceNameFinal, newLoc, { taintarg(context(), d) });
         op.setSource();
         NumberObject* result = NumberObject::createTainted(context(), d, TaintFlow(op));
         vp.setObject(*result);
