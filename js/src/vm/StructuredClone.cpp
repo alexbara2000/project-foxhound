@@ -76,6 +76,7 @@
 #include "wasm/WasmJS.h"
 
 #include "vm/ArrayObject-inl.h"
+#include "vm/BooleanObject-inl.h"
 #include "vm/Compartment-inl.h"
 #include "vm/ErrorObject-inl.h"
 #include "vm/InlineCharBuffer-inl.h"
@@ -2062,32 +2063,25 @@ bool JSStructuredCloneWriter::startWrite(HandleValue v) {
         return false;
       }
       int flag = 0;
-      const char* sourceName;
-      std::u16string filename;
-      uint32_t line;
-      uint32_t pos;
-      uint32_t scriptStartLine;
-      std::u16string function;
-      TaintMd5 scriptHash;
       bool isTainted = isTaintedNumber(rootedObj);
       if(isTainted){
         flag = 1;
-
-        // Get the source name
-        sourceName = getNumberTaint(rootedObj).source().name();
-
-        // Get the location components
-        TaintLocation location = getNumberTaint(rootedObj).source().location();
-        filename = location.filename();
-        line = location.line();
-        pos= location.pos();
-        scriptStartLine = location.scriptStartLine();
-        function = location.function();
-        scriptHash = location.scriptHash();
       }
       bool result = out.writePair(SCTAG_NUMBER_OBJECT, flag) && out.writeDouble(unboxed.toNumber());
 
       if (isTainted){
+        // Get the source name
+        const char* sourceName = getNumberTaint(rootedObj).source().name();
+
+        // Get the location components
+        TaintLocation location = getNumberTaint(rootedObj).source().location();
+        std::u16string filename = location.filename();
+        uint32_t line = location.line();
+        uint32_t pos= location.pos();
+        uint32_t scriptStartLine = location.scriptStartLine();
+        std::u16string function = location.function();
+        TaintMd5 scriptHash = location.scriptHash();
+
         // TaintFox
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
 
@@ -2126,10 +2120,57 @@ bool JSStructuredCloneWriter::startWrite(HandleValue v) {
     }
     case ESClass::Boolean: {
       RootedValue unboxed(context());
+      RootedValue rootedObj(context(), JS::ObjectValue(*obj));
       if (!Unbox(context(), obj, &unboxed)) {
         return false;
       }
-      return out.writePair(SCTAG_BOOLEAN_OBJECT, unboxed.toBoolean());
+      bool isTainted = isTaintedBoolean(rootedObj);
+      int data=unboxed.toBoolean();
+      if (isTainted){
+        data+=2;
+      }
+      bool result = out.writePair(SCTAG_BOOLEAN_OBJECT, data);
+      if (isTainted){
+        // Get the source name
+        const char* sourceName = getBooleanTaint(rootedObj).source().name();
+
+        // Get the location components
+        TaintLocation location = getBooleanTaint(rootedObj).source().location();
+        std::u16string filename = location.filename();
+        uint32_t line = location.line();
+        uint32_t pos= location.pos();
+        uint32_t scriptStartLine = location.scriptStartLine();
+        std::u16string function = location.function();
+        TaintMd5 scriptHash = location.scriptHash();
+
+        // TaintFox
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+
+        // Write source
+        std::u16string u16Str = convert.from_bytes(sourceName);
+        char16_t* u16Array = new char16_t[u16Str.size() + 1];
+        std::copy(u16Str.begin(), u16Str.end(), u16Array);
+        u16Array[u16Str.size()] = 0;
+        result = result  && out.writeDouble(u16Str.size() + 1);
+        result = result  && out.writeChars(u16Array, u16Str.size() + 1);
+
+        // Write location
+        u16Array = new char16_t[filename.size() + 1];
+        std::copy(filename.begin(), filename.end(), u16Array);
+        u16Array[filename.size()] = 0;
+        result = result  && out.writeDouble(filename.size() + 1);
+        result = result  && out.writeChars(u16Array, filename.size() + 1);
+        result = result  && out.writeDouble(line + 1);
+        result = result  && out.writeDouble(pos + 1);
+        result = result  && out.writeDouble(scriptStartLine + 1);
+        u16Array = new char16_t[function.size() + 1];
+        std::copy(function.begin(), function.end(), u16Array);
+        u16Array[function.size()] = 0;
+        result = result  && out.writeDouble(function.size() + 1);
+        result = result  && out.writeChars(u16Array, function.size() + 1);
+        result = result  && out.writeArray(scriptHash.data(), scriptHash.size());
+      }
+      return result;
     }
     case ESClass::RegExp: {
       RegExpShared* re = RegExpToShared(context(), obj);
@@ -2951,6 +2992,7 @@ bool JSStructuredCloneReader::startRead(MutableHandleValue vp,
                                         ShouldAtomizeStrings atomizeStrings) {
   uint32_t tag, data;
   bool alreadAppended = false;
+  bool isTainted=false;
 
   if (!in.readPair(&tag, &data)) {
     return false;
@@ -2973,6 +3015,59 @@ bool JSStructuredCloneReader::startRead(MutableHandleValue vp,
 
     case SCTAG_BOOLEAN:
     case SCTAG_BOOLEAN_OBJECT:
+      isTainted = data>=2;
+      if (isTainted){
+        data-=2;
+      }
+      if (tag == SCTAG_BOOLEAN_OBJECT && isTainted){
+        bool operationResult;
+        if (data==1){
+          operationResult=true;
+        }
+        else{
+          operationResult=false;
+        }
+        // TaintFox
+        // data being 2 or 3 represents a tainted objects so we need to get the source.
+        // 2 means false and 3 means true
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+
+        // Reading source name
+        double size;
+        in.readDouble(&size);
+        char16_t* sourceName = new char16_t[size];
+        in.readChars(sourceName, size);
+        std::string u8Str = convert.to_bytes(sourceName);
+        char* u8Array = new char[u8Str.size() + 1];
+        std::copy(u8Str.begin(), u8Str.end(), u8Array);
+        u8Array[u8Str.size()] = '\0';
+        const char* sourceNameFinal = u8Array;
+
+        // Reading location
+        char16_t* fileName;
+        double line;
+        double pos;
+        double scriptStartLine;
+        char16_t* function;
+        TaintMd5 scriptHash;
+        in.readDouble(&size);
+        fileName = new char16_t[size];
+        in.readChars(fileName, size);
+        in.readDouble(&line);
+        in.readDouble(&pos);
+        in.readDouble(&scriptStartLine);
+        in.readDouble(&size);
+        function = new char16_t[size];
+        in.readChars(function, size);
+        in.readArray(scriptHash.begin(),16);
+
+        TaintLocation newLoc =TaintLocation(fileName, line,pos,scriptStartLine,scriptHash,function);
+        TaintOperation op(sourceNameFinal, newLoc, { taintarg(context(), operationResult) });
+        op.setSource();
+        BooleanObject* result = BooleanObject::createTainted(context(), operationResult, TaintFlow(op));
+        vp.setObject(*result);
+        break;
+      }
       vp.setBoolean(!!data);
       if (tag == SCTAG_BOOLEAN_OBJECT && !PrimitiveToObject(context(), vp)) {
         return false;
