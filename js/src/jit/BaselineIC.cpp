@@ -493,6 +493,7 @@ static void MaybeTransition(JSContext* cx, BaselineFrame* frame,
 template <typename IRGenerator, typename... Args>
 static void TryAttachStub(const char* name, JSContext* cx, BaselineFrame* frame,
                           ICFallbackStub* stub, Args&&... args) {
+  return;
   MaybeTransition(cx, frame, stub);
 
   if (stub->state().canAttachStub()) {
@@ -2377,6 +2378,9 @@ bool DoCompareFallback(JSContext* cx, BaselineFrame* frame,
       out = !out;
       break;
     case JSOp::StrictEq:
+      // if (isAnyTaintedValue(lhsCopy, rhsCopy)){
+        // std::cerr << "Values are tainted in BaselineIC interpreter" << std::endl;
+      // }
       if (!js::StrictlyEqual(cx, lhsCopy, rhsCopy, &out)) {
         return false;
       }
@@ -2399,6 +2403,7 @@ bool DoCompareFallback(JSContext* cx, BaselineFrame* frame,
 }
 
 bool FallbackICCodeCompiler::emit_Compare() {
+  // return false;
   static_assert(R0 == JSReturnOperand);
 
   // Restore the tail call register.
