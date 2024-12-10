@@ -2697,6 +2697,7 @@ void HTMLInputElement::HandleNumberControlSpin(void* aData) {
 nsresult HTMLInputElement::SetValueInternal(
     const nsAString& aValue, const nsAString* aOldValue,
     const ValueSetterOptions& aOptions) {
+  ReportTaintSink(aValue, "HTMLInputElemnet.setValue", aValue);
   MOZ_ASSERT(GetValueMode() != VALUE_MODE_FILENAME,
              "Don't call SetValueInternal for file inputs");
 
