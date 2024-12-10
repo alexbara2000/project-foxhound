@@ -3432,7 +3432,8 @@ JS_PUBLIC_API JS::UniqueChars JS_EncodeStringToASCII(JSContext* cx,
                                                      JSString* str) {
   AssertHeapIsIdle();
   CHECK_THREAD(cx);
-
+  JS::RootedString rootedStr(cx, str);
+  JS_ReportTaintSink(cx,rootedStr, "EncodeStringToASCII");
   return js::EncodeAscii(cx, str);
 }
 
@@ -3440,7 +3441,8 @@ JS_PUBLIC_API JS::UniqueChars JS_EncodeStringToLatin1(JSContext* cx,
                                                       JSString* str) {
   AssertHeapIsIdle();
   CHECK_THREAD(cx);
-
+  JS::RootedString rootedStr(cx, str);
+  JS_ReportTaintSink(cx,rootedStr, "EncodeStringToLatin");
   return js::EncodeLatin1(cx, str);
 }
 
@@ -3448,7 +3450,8 @@ JS_PUBLIC_API JS::UniqueChars JS_EncodeStringToUTF8(JSContext* cx,
                                                     HandleString str) {
   AssertHeapIsIdle();
   CHECK_THREAD(cx);
-
+  JS::RootedString rootedStr(cx, str);
+  JS_ReportTaintSink(cx,rootedStr, "EncodeStringToUTF8");
   return StringToNewUTF8CharsZ(cx, *str);
 }
 
@@ -3466,7 +3469,8 @@ JS_PUBLIC_API bool JS_EncodeStringToBuffer(JSContext* cx, JSString* str,
                                            char* buffer, size_t length) {
   AssertHeapIsIdle();
   CHECK_THREAD(cx);
-
+  JS::RootedString rootedStr(cx, str);
+  JS_ReportTaintSink(cx,rootedStr, "EncodeStringToBuffer");
   JSLinearString* linear = str->ensureLinear(cx);
   if (!linear) {
     return false;
@@ -3491,6 +3495,8 @@ JS_EncodeStringToUTF8BufferPartial(JSContext* cx, JSString* str,
                                    mozilla::Span<char> buffer) {
   AssertHeapIsIdle();
   CHECK_THREAD(cx);
+  JS::RootedString rootedStr(cx, str);
+  JS_ReportTaintSink(cx,rootedStr, "EncodeStringToBufferPartial");
   JS::AutoCheckCannotGC nogc;
   return str->encodeUTF8Partial(nogc, buffer);
 }
