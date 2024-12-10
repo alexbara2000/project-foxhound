@@ -227,15 +227,6 @@ JS_PUBLIC_API bool JS::LooselyEqual(JSContext* cx, Handle<Value> value1,
 
 bool js::StrictlyEqual(JSContext* cx, JS::Handle<JS::Value> lval,
                        JS::Handle<JS::Value> rval, bool* equal) {
-  if (SameType(lval, rval)) {
-    return EqualGivenSameType(cx, lval, rval, equal);
-  }
-
-  if (lval.isNumber() && rval.isNumber()) {
-    *equal = (lval.toNumber() == rval.toNumber());
-    return true;
-  }
-
   // TaintFox: special case to handle strict equality of tainted numbers and booleans.
   if (isAnyTaintedValue(lval, rval) &&
       (lval.isNumber() || lval.isBoolean() || isTaintedValue(lval)) &&
@@ -247,7 +238,13 @@ bool js::StrictlyEqual(JSContext* cx, JS::Handle<JS::Value> lval,
     *equal = (l == r);
     return true;
   }
-
+  if (SameType(lval, rval)) {
+    return EqualGivenSameType(cx, lval, rval, equal);
+  }
+  if (lval.isNumber() && rval.isNumber()) {
+    *equal = (lval.toNumber() == rval.toNumber());
+    return true;
+  }
   *equal = false;
   return true;
 }
