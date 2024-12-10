@@ -132,6 +132,7 @@ void IonIC::trace(JSTracer* trc, IonScript* ionScript) {
 template <typename IRGenerator, typename... Args>
 static void TryAttachIonStub(JSContext* cx, IonIC* ic, IonScript* ionScript,
                              Args&&... args) {
+  return;
   if (ic->state().maybeTransition()) {
     ic->discardStubs(cx->zone(), ionScript);
   }
@@ -702,6 +703,9 @@ bool IonCompareIC::update(JSContext* cx, HandleScript outerScript,
       *res = !*res;
       break;
     case JSOp::StrictEq:
+      if (isAnyTaintedValue(lhsCopy, rhsCopy)){
+        std::cerr << "Values are tainted in portable interpreter" << std::endl;
+      }
       if (!js::StrictlyEqual(cx, lhsCopy, rhsCopy, res)) {
         return false;
       }
