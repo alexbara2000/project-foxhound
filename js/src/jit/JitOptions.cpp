@@ -151,10 +151,10 @@ DefaultJitOptions::DefaultJitOptions() {
 #endif
 
   // Whether the Baseline JIT is enabled.
-  SET_DEFAULT(baselineJit, true);
+  SET_DEFAULT(baselineJit, false);
 
   // Whether the IonMonkey JIT is enabled.
-  SET_DEFAULT(ion, true);
+  SET_DEFAULT(ion, false);
 
   // Whether the IonMonkey and Baseline JITs are enabled for Trusted Principals.
   // (Ignored if ion or baselineJit is set to true.)

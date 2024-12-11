@@ -9,6 +9,7 @@
 #include "mozilla/ErrorResult.h"
 #include "mozilla/UniquePtrExtensions.h"
 #include "nsReadableUtils.h"
+#include "nsTaintingUtils.h"
 
 namespace mozilla::dom {
 
@@ -17,6 +18,7 @@ void TextEncoder::Encode(JSContext* aCx, JS::Handle<JSObject*> aObj,
                          JS::MutableHandle<JSObject*> aRetval,
                          ErrorResult& aRv) {
   JSAutoRealm ar(aCx, aObj);
+  ReportTaintSink(aUtf8String, "TextEncoder.encode");
   JSObject* outView = Uint8Array::Create(aCx, aUtf8String, aRv);
   if (aRv.Failed()) {
     return;
@@ -29,6 +31,8 @@ void TextEncoder::EncodeInto(JSContext* aCx, JS::Handle<JSString*> aSrc,
                              const Uint8Array& aDst,
                              TextEncoderEncodeIntoResult& aResult,
                              OOMReporter& aError) {
+  JS::Rooted<JS::Value> value(aCx, JS::StringValue(aSrc));
+  ReportTaintSink(aCx, value, "TextEncoder.encodeInto");
   DebugOnly<size_t> dstLength = 0;
   auto maybe = aDst.ProcessData(
       [&](const Span<uint8_t>& aData, JS::AutoCheckCannotGC&&) {

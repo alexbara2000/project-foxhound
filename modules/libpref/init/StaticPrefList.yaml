@@ -7306,13 +7306,13 @@
 
 - name: javascript.options.baselinejit
   type: bool
-  value: true
+  value: false
   mirror: always  # LoadStartupJSPrefs
   do_not_use_directly: true
 
 - name: javascript.options.ion
   type: bool
-  value: true
+  value: false
   mirror: always  # LoadStartupJSPrefs
   do_not_use_directly: true
 
