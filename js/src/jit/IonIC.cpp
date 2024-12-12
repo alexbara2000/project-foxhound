@@ -132,7 +132,9 @@ void IonIC::trace(JSTracer* trc, IonScript* ionScript) {
 template <typename IRGenerator, typename... Args>
 static void TryAttachIonStub(JSContext* cx, IonIC* ic, IonScript* ionScript,
                              Args&&... args) {
-  return;
+  if (JitOptions.disableInlineCaches) {
+    return;
+  }
   if (ic->state().maybeTransition()) {
     ic->discardStubs(cx->zone(), ionScript);
   }
