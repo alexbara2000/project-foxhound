@@ -4964,7 +4964,7 @@ JS_ReportTaintSink(JSContext* cx, JS::HandleValue value, const char* sink, JS::H
     // Extend the taint flow to include the sink function
     number.taint().extend(TaintOperationFromContext(cx, sink, true, arg, true));
 
-    JS_ReportTaintSink(cx, sink, arg, number.taint(), value, true);
+    JS_ReportTaintSink(cx, sink, arg, number.getTaintFlow(), value, true);
 
   }
   else if(value.isObject()){
@@ -5054,7 +5054,8 @@ JS_ReportTaintSink(JSContext* cx, const char* sink, JS::HandleValue arg, TaintFl
 
     JS::RootedValueArray<3> arguments(cx);
     if(isNumber){
-      arguments[0].setNumber(value.toObject().as<NumberObject>().unbox());
+      JS::RootedString strOb(cx, JS::ToString(cx, value));
+      arguments[0].setString(strOb);
     }
     else{
       JS::RootedString strobj(cx, value.toString());
