@@ -10,6 +10,7 @@ interface MouseScrollEvent : MouseEvent
   const long HORIZONTAL_AXIS = 1;
   const long VERTICAL_AXIS = 2;
 
+  [TaintSource]
   readonly attribute long axis;
 
   undefined initMouseScrollEvent(DOMString type,

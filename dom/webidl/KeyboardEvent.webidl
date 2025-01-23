@@ -20,8 +20,9 @@ interface KeyboardEvent : UIEvent
   readonly attribute boolean          altKey;
   [NeedsCallerType, TaintSource]
   readonly attribute boolean          ctrlKey;
-  [NeedsCallerType]
+  [NeedsCallerType, TaintSource]
   readonly attribute boolean          shiftKey;
+  [TaintSource]
   readonly attribute boolean          metaKey;
 
   [NeedsCallerType]
@@ -32,8 +33,11 @@ interface KeyboardEvent : UIEvent
   const unsigned long DOM_KEY_LOCATION_RIGHT    = 0x02;
   const unsigned long DOM_KEY_LOCATION_NUMPAD   = 0x03;
 
+  [TaintSource]
   readonly attribute unsigned long location;
+  [TaintSource]
   readonly attribute boolean       repeat;
+  [TaintSource]
   readonly attribute boolean       isComposing;
 
   [TaintSource]

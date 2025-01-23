@@ -46,8 +46,11 @@ interface MouseEvent : UIEvent {
   readonly attribute boolean        ctrlKey;
   [TaintSource]
   readonly attribute boolean        shiftKey;
+  [TaintSource]
   readonly attribute boolean        altKey;
+  [TaintSource]
   readonly attribute boolean        metaKey;
+  [TaintSource]
   readonly attribute short          button;
   readonly attribute unsigned short buttons;
   readonly attribute EventTarget?   relatedTarget;

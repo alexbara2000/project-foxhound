@@ -30,23 +30,28 @@ dictionary TouchInit {
 interface Touch {
   constructor(TouchInit touchInitDict);
 
+  [TaintSource]
   readonly    attribute long         identifier;
   readonly    attribute EventTarget? target;
-  [NeedsCallerType]
+  [NeedsCallerType, TaintSource]
   readonly    attribute long         screenX;
-  [NeedsCallerType]
+  [NeedsCallerType, TaintSource]
   readonly    attribute long         screenY;
 
+  [TaintSource]
   readonly    attribute long         clientX;
+  [TaintSource]
   readonly    attribute long         clientY;
+  [TaintSource]
   readonly    attribute long         pageX;
+  [TaintSource]
   readonly    attribute long         pageY;
-  [NeedsCallerType]
+  [NeedsCallerType, TaintSource]
   readonly    attribute long         radiusX;
-  [NeedsCallerType]
+  [NeedsCallerType, TaintSource]
   readonly    attribute long         radiusY;
-  [NeedsCallerType]
+  [NeedsCallerType, TaintSource]
   readonly    attribute float        rotationAngle;
-  [NeedsCallerType]
+  [NeedsCallerType, TaintSource]
   readonly    attribute float        force;
 };

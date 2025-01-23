@@ -14,17 +14,26 @@ interface PointerEvent : MouseEvent
 {
   constructor(DOMString type, optional PointerEventInit eventInitDict = {});
 
+  [TaintSource]
   readonly attribute long pointerId;
 
+  [TaintSource]
   readonly attribute long width;
+  [TaintSource]
   readonly attribute long height;
+  [TaintSource]
   readonly attribute float pressure;
+  [TaintSource]
   readonly attribute float tangentialPressure;
+  [TaintSource]
   readonly attribute long tiltX;
+  [TaintSource]
   readonly attribute long tiltY;
+  [TaintSource]
   readonly attribute long twist;
 
   readonly attribute DOMString pointerType;
+  [TaintSource]
   readonly attribute boolean isPrimary;
 
   [Func="mozilla::dom::PointerEvent::EnableGetCoalescedEvents"]

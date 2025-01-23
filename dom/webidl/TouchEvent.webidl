@@ -19,9 +19,13 @@ interface TouchEvent : UIEvent {
   readonly attribute TouchList targetTouches;
   readonly attribute TouchList changedTouches;
 
+  [TaintSource]
   readonly attribute boolean altKey;
+  [TaintSource]
   readonly attribute boolean metaKey;
+  [TaintSource]
   readonly attribute boolean ctrlKey;
+  [TaintSource]
   readonly attribute boolean shiftKey;
 
   undefined initTouchEvent(DOMString type,
