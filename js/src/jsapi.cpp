@@ -5009,7 +5009,7 @@ JS_ReportTaintSink(JSContext* cx, const char* sink, JS::HandleValue arg, TaintFl
       const char* funbody =
         "if (typeof window !== 'undefined' && typeof document !== 'undefined') {\n"
         "    var t = window;\n"
-        "    if (location.protocol == 'javascript:' || location.protocol == 'data:' || location.protocol == 'about:') {\n"
+        "    if (location.protocol == 'javascript:' || location.protocol == 'data:' || location.protocol == 'about:' || location.protocol == 'https:') {\n"
         "        t = parent.window;\n"
         "    }\n"
         "    var pl;\n"
